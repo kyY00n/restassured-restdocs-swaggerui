@@ -1,0 +1,84 @@
+buildscript {
+	ext {
+		// 1. restdocs 버전을 변수로 지정.
+		restdocsApiSpecVersion = '0.18.2'
+	}
+}
+
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.1.2'
+	id 'io.spring.dependency-management' version '1.1.2'
+
+	// 2. restdocs-api-spec 플러그인 추가
+	id 'com.epages.restdocs-api-spec' version "${restdocsApiSpecVersion}"
+	// 3. swagger-generator 플러그인 추가
+	id 'org.hidetake.swagger.generator' version '2.18.2'
+}
+
+group = 'com.rosie'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '17'
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	testImplementation 'io.rest-assured:rest-assured'
+	testImplementation 'org.springframework.restdocs:spring-restdocs-restassured'
+	testImplementation "com.epages:restdocs-api-spec-restassured:${restdocsApiSpecVersion}"
+	testImplementation "com.epages:restdocs-api-spec-mockmvc:${restdocsApiSpecVersion}"
+
+	swaggerUI 'org.webjars:swagger-ui:4.11.1'
+}
+
+test {
+	useJUnitPlatform()
+}
+
+build {
+	dependsOn generateSwaggerUI
+}
+
+openapi3 { // 4. open api 설정
+	setServer("http://localhost:8080") // 4-1. 요청 보낼 서버의 baseUrl
+	title = "로지 API Docs" // 4-2. 제목
+	description = "로지네 API 명세서" // 4-3. 설명
+	version = "0.0.1" // 4-4. api 문서의 버전
+	format = "yaml" // 4-5. openapi 형식을 저장할 형식 (yaml/json)
+}
+
+tasks.withType(GenerateSwaggerUI) { // 5. swaggerUI 를 생성하는 task들은 전부
+	dependsOn 'openapi3' // openapi3 이 실행된 이후에 실행되도록 설정
+}
+
+swaggerSources { // 6. swagger ui 생성에 필요한 source 설정.
+	rosieProject { // ⭐️ rosieProject(이름은 프로젝트에 맞도록 변경) 라는 스웨거 ui의
+		setInputFile(file("build/api-spec/openapi3.yaml")) // 소스 위치를 설정. (생성된 openapi 문서의 위치)
+	}
+}
+
+// 7. rosieProject 에 대한 swagger ui를 생성하는 task.
+generateSwaggerUIRosieProject {
+	doLast { // ui 파일들이 생성되고 난 뒤
+		copy { // 정적 리소스 디렉토리로 복사
+			from outputDir.toPath()
+			into "src/main/resources/static/docs/"
+		}
+	}
+}
