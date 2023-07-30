@@ -42,13 +42,10 @@ public class HelloAcceptanceTest extends AcceptanceTest {
     }
 
     private RestDocumentationFilter 성공_응답_문서_만들기(String 제목) {
-        return document(제목,
-                API_정보.responseSchema(성공_응답_형식),
+        return document(제목, API_정보.responseSchema(성공_응답_형식),
                 pathParameters(parameterWithName("name").description("놀러와주신 분의 성함")),
-                responseFields(
-                        fieldWithPath("messages").description("환영의 단어들"),
-                        fieldWithPath("ps").description("로지가 추가로 전하는 말").optional()
-                ));
+                responseFields(fieldWithPath("messages").description("환영의 단어들"),
+                        fieldWithPath("ps").description("로지가 추가로 전하는 말").optional()));
     }
 
     @Test
