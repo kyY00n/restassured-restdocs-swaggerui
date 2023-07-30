@@ -35,9 +35,7 @@ public abstract class AcceptanceTest {
     @BeforeEach
     void setUpRestDocs(RestDocumentationContextProvider provider) {
         RestAssuredOperationPreprocessorsConfigurer filter = documentationConfiguration(provider)
-                .operationPreprocessors()
-                .withRequestDefaults(prettyPrint())
-                .withResponseDefaults(prettyPrint());
+                .operationPreprocessors();
 
         this.spec = new RequestSpecBuilder()
                 .setPort(port)

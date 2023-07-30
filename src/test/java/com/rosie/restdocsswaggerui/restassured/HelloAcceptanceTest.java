@@ -29,7 +29,7 @@ public class HelloAcceptanceTest extends AcceptanceTest {
         // given
         var 요청_준비 = given(spec)
                 .contentType(JSON)
-                .filter(성공_응답_문서_만들기("성공"));
+                .filter(성공_응답_문서_만들기("hello-rosie-world-성공"));
 
         // when
         var 응답 = 요청_준비.when()
@@ -56,7 +56,7 @@ public class HelloAcceptanceTest extends AcceptanceTest {
         // given
         var 요청_준비 = given(spec)
                 .contentType(JSON)
-                .filter(실패_응답_문서_만들기());
+                .filter(실패_응답_문서_만들기("hello-rosie-world-코치라서-실패"));
 
         // when
         var 응답 = 요청_준비.when()
@@ -68,8 +68,8 @@ public class HelloAcceptanceTest extends AcceptanceTest {
                 .assertThat().statusCode(BAD_REQUEST.value());
     }
 
-    private RestDocumentationFilter 실패_응답_문서_만들기() {
-        return document("실패", API_정보.responseSchema(schema("ErrorResponse")));
+    private RestDocumentationFilter 실패_응답_문서_만들기(String name) {
+        return document(name, API_정보.responseSchema(schema("ErrorResponse")));
     }
 
 }
